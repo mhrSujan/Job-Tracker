@@ -1,5 +1,7 @@
 # Node modules (ignore ALL node_modules in project)
 node_modules/
+client/node_modules/
+server/node_modules/
 
 # Logs
 npm-debug.log*
