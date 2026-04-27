@@ -1,124 +1,118 @@
-import { useEffect, useState } from "react";
-import API from "../api";
-import "./Dashboard.css"
 
-const statusColors = {
-  applied: { bg: "#1a2a1a", accent: "#4ade80", label: "Applied" },
-  interview: { bg: "#1a1a2a", accent: "#818cf8", label: "Interview" },
-  offer: { bg: "#1a2a20", accent: "#34d399", label: "Offer 🎉" },
-  rejected: { bg: "#2a1a1a", accent: "#f87171", label: "Rejected" },
+import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import { jobsAPI } from "../api";
+import { useAuth } from "../context/AuthContext";
+import Nav from "../components/Nav";
+import "./Dashboard.css";
+
+const STATUS_META = {
+  applied:   { accent: "#4ade80", bg: "#0d1a0d", label: "Applied" },
+  interview: { accent: "#818cf8", bg: "#0d0d1a", label: "Interview" },
+  offer:     { accent: "#34d399", bg: "#0d1a14", label: "Offer 🎉" },
+  rejected:  { accent: "#f87171", bg: "#1a0d0d", label: "Rejected" },
 };
 
 export default function Dashboard() {
-  const [jobs, setJobs] = useState([]);
+  const { user, logout } = useAuth();
+  const displayName = user?.name || user?.email || "User";
+  const [jobs,    setJobs]    = useState([]);
   const [company, setCompany] = useState("");
-  const [role, setRole] = useState("");
-  const [status, setStatus] = useState("applied");
+  const [role,    setRole]    = useState("");
+  const [status,  setStatus]  = useState("applied");
+  const [notes,   setNotes]   = useState("");
+  const [link,    setLink]    = useState("");
   const [loading, setLoading] = useState(true);
-  const [adding, setAdding] = useState(false);
-  const [filter, setFilter] = useState("all");
+  const [adding,  setAdding]  = useState(false);
+  const [filter,  setFilter]  = useState("all");
+  const [error,   setError]   = useState("");
 
   const fetchJobs = async () => {
     try {
-      const res = await API.get("/jobs");
+      const res = await jobsAPI.list();
       setJobs(res.data);
-    } catch {
-      window.location = "/login";
     } finally {
       setLoading(false);
     }
   };
 
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (!token) {
-      window.location = "/login";
-    } else {
-      fetchJobs();
-    }
-  }, []);
+  useEffect(() => { fetchJobs(); }, []);
 
   const addJob = async () => {
-    if (!company || !role) return alert("Fill all fields");
+    if (!company || !role) return setError("Company and role are required");
+    setError("");
     setAdding(true);
-    await API.post("/jobs", { company, role, status });
-    setCompany("");
-    setRole("");
-    setStatus("applied");
-    setAdding(false);
-    fetchJobs();
+    try {
+      await jobsAPI.add({ company, role, status, notes, link });
+      setCompany(""); setRole(""); setStatus("applied"); setNotes(""); setLink("");
+      fetchJobs();
+    } catch {
+      setError("Failed to add job");
+    } finally {
+      setAdding(false);
+    }
   };
 
-  const deleteJob = async (id) => {
-    await API.delete(`/jobs/${id}`);
-    fetchJobs();
-  };
-
-  const updateStatus = async (id, newStatus) => {
-    await API.put(`/jobs/${id}`, { status: newStatus });
-    fetchJobs();
-  };
-
-  const logout = () => {
-    localStorage.removeItem("token");
-    window.location = "/login";
-  };
+  const deleteJob    = async (id)            => { await jobsAPI.remove(id);           fetchJobs(); };
+  const updateStatus = async (id, newStatus) => { await jobsAPI.update(id, { status: newStatus }); fetchJobs(); };
 
   const filteredJobs = filter === "all" ? jobs : jobs.filter(j => j.status === filter);
-
   const stats = {
-    total: jobs.length,
+    total:     jobs.length,
     interview: jobs.filter(j => j.status === "interview").length,
-    offer: jobs.filter(j => j.status === "offer").length,
+    offer:     jobs.filter(j => j.status === "offer").length,
+    rejected:  jobs.filter(j => j.status === "rejected").length,
   };
 
   return (
-
+    <>
+      <Nav />
       <div className="dashboard">
+        {/* Header */}
         <div className="header">
           <div>
-            <h1 className="title">Job<span>Track</span></h1>
-            <p className="subtitle">Application pipeline</p>
+            <h1 className="title">My Tracker</h1>
+            <p className="subtitle">
+              Welcome back, {displayName} &nbsp;·&nbsp;
+              <Link to="/applied" style={{ color: "#4ade80", textDecoration: "none" }}>
+                View platform applications →
+              </Link>
+            </p>
           </div>
-          <button className="logout-btn" onClick={logout}>Sign out</button>
         </div>
 
+        {/* Stats */}
         <div className="stats-row">
-          <div className="stat-card" style={{ "--accent": "#818cf8" }}>
-            <div className="stat-num">{stats.total}</div>
-            <div className="stat-label">Total Applied</div>
-          </div>
-          <div className="stat-card" style={{ "--accent": "#fb923c" }}>
-            <div className="stat-num">{stats.interview}</div>
-            <div className="stat-label">Interviews</div>
-          </div>
-          <div className="stat-card" style={{ "--accent": "#4ade80" }}>
-            <div className="stat-num">{stats.offer}</div>
-            <div className="stat-label">Offers</div>
-          </div>
+          {[
+            { label: "Total Applied",  num: stats.total,     accent: "#818cf8" },
+            { label: "Interviews",     num: stats.interview, accent: "#fb923c" },
+            { label: "Offers",         num: stats.offer,     accent: "#4ade80" },
+            { label: "Rejected",       num: stats.rejected,  accent: "#f87171" },
+          ].map(s => (
+            <div key={s.label} className="stat-card" style={{ "--accent": s.accent }}>
+              <div className="stat-num">{s.num}</div>
+              <div className="stat-label">{s.label}</div>
+            </div>
+          ))}
         </div>
 
+        {/* Add form */}
         <div className="add-form">
           <div className="form-row">
             <div className="field">
               <label className="form-label">Company</label>
-              <input
-                className="input"
-                placeholder="e.g. Stripe"
-                value={company}
-                onChange={e => setCompany(e.target.value)}
-                onKeyDown={e => e.key === "Enter" && addJob()}
-              />
+              <input className="input" placeholder="e.g. Stripe" value={company}
+                onChange={e => setCompany(e.target.value)} onKeyDown={e => e.key === "Enter" && addJob()} />
             </div>
             <div className="field">
               <label className="form-label">Role</label>
-              <input
-                className="input"
-                placeholder="e.g. SWE Intern"
-                value={role}
-                onChange={e => setRole(e.target.value)}
-                onKeyDown={e => e.key === "Enter" && addJob()}
-              />
+              <input className="input" placeholder="e.g. SWE Intern" value={role}
+                onChange={e => setRole(e.target.value)} onKeyDown={e => e.key === "Enter" && addJob()} />
+            </div>
+            <div className="field">
+              <label className="form-label">Link (optional)</label>
+              <input className="input" placeholder="https://..." value={link}
+                onChange={e => setLink(e.target.value)} />
             </div>
             <div className="field">
               <label className="form-label">Status</label>
@@ -129,61 +123,53 @@ export default function Dashboard() {
                 <option value="rejected">Rejected</option>
               </select>
             </div>
-            <div className="field">
+            <div className="field btn-field">
               <label className="form-label">&nbsp;</label>
               <button className="add-btn" onClick={addJob} disabled={adding}>
                 {adding ? "Adding…" : "+ Add"}
               </button>
             </div>
           </div>
+          {error && <div className="form-error">{error}</div>}
         </div>
 
+        {/* Filters */}
         <div className="filters">
-          {["all", "applied", "interview", "offer", "rejected"].map(f => (
-            <button
-              key={f}
-              className={`filter-btn ${filter === f ? "active" : ""}`}
-              onClick={() => setFilter(f)}
-            >
-              {f}
-            </button>
+          {["all","applied","interview","offer","rejected"].map(f => (
+            <button key={f} className={`filter-btn ${filter === f ? "active" : ""}`}
+              onClick={() => setFilter(f)}>{f}</button>
           ))}
         </div>
 
+        {/* Job list */}
         <div className="jobs-list">
           {loading ? (
-            <div className="loading">Loading applications…</div>
+            <div className="loading">Loading…</div>
           ) : filteredJobs.length === 0 ? (
             <div className="empty">
               <div className="empty-icon">📭</div>
-              {filter === "all" ? "No applications yet. Add your first one above." : `No ${filter} applications.`}
+              {filter === "all" ? "No applications yet. Add your first above." : `No ${filter} applications.`}
             </div>
           ) : (
             filteredJobs.map(job => {
-              const s = statusColors[job.status] || statusColors.applied;
+              const s = STATUS_META[job.status] || STATUS_META.applied;
               return (
-                <div
-                  key={job._id}
-                  className="job-card"
-                  style={{ "--bg": s.bg, "--accent": s.accent }}
-                >
+                <div key={job._id} className="job-card" style={{ "--bg": s.bg, "--accent": s.accent }}>
                   <div className="job-info">
                     <div className="job-company">{job.company}</div>
                     <div className="job-role">{job.role}</div>
-                    {job.dateApplied && (
-                      <div className="job-date">
-                        {new Date(job.dateApplied).toLocaleDateString("en-US", {
-                          month: "short", day: "numeric", year: "numeric"
-                        })}
-                      </div>
+                    {job.link && (
+                      <a className="job-link" href={job.link} target="_blank" rel="noreferrer">
+                        View posting ↗
+                      </a>
                     )}
+                    <div className="job-date">
+                      {new Date(job.dateApplied).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+                    </div>
                   </div>
                   <div className="job-actions">
-                    <select
-                      className="status-select"
-                      value={job.status}
-                      onChange={e => updateStatus(job._id, e.target.value)}
-                    >
+                    <select className="status-select" value={job.status}
+                      onChange={e => updateStatus(job._id, e.target.value)}>
                       <option value="applied">Applied</option>
                       <option value="interview">Interview</option>
                       <option value="offer">Offer</option>
@@ -198,6 +184,6 @@ export default function Dashboard() {
           )}
         </div>
       </div>
-
+    </>
   );
 }

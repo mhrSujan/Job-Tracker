@@ -1,0 +1,103 @@
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Mono:wght@300;400;500&display=swap');
+
+.myapps { max-width: 860px; margin: 0 auto; padding: 40px 24px; font-family: 'DM Mono', monospace; }
+
+.myapps-header { margin-bottom: 28px; }
+.myapps-title  { font-family: 'Syne', sans-serif; font-size: 36px; font-weight: 800; color: #fff; letter-spacing: -1px; }
+.myapps-sub    { font-size: 11px; color: #555; margin-top: 4px; letter-spacing: 1px; }
+
+.app-stats {
+  display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-bottom: 24px;
+}
+.app-stat {
+  background: #111; border: 1px solid #1e1e1e; border-top: 2px solid var(--c);
+  padding: 14px 12px; display: flex; flex-direction: column; align-items: center; gap: 4px;
+}
+.app-stat-icon  { font-size: 18px; }
+.app-stat-num   { font-family: 'Syne', sans-serif; font-size: 24px; font-weight: 800; color: var(--c); }
+.app-stat-label { font-size: 9px; text-transform: uppercase; letter-spacing: 1.5px; color: #555; text-align: center; }
+
+.filters { display: flex; gap: 4px; margin-bottom: 20px; flex-wrap: wrap; }
+.filter-btn {
+  background: transparent; border: 1px solid #1e1e1e; color: #444;
+  font-family: 'DM Mono', monospace; font-size: 10px;
+  padding: 5px 12px; cursor: pointer; letter-spacing: 1px;
+  text-transform: uppercase; transition: all 0.2s;
+}
+.filter-btn.active { border-color: #4ade80; color: #4ade80; background: #0d1a0d; }
+
+.myapps-error {
+  background: #1a0808; border: 1px solid #f87171; color: #f87171;
+  font-size: 11px; padding: 10px 14px; margin-bottom: 20px;
+}
+
+.loading { text-align: center; padding: 60px; color: #333; font-size: 12px; letter-spacing: 2px; animation: pulse 1.5s infinite; }
+@keyframes pulse { 0%,100%{opacity:.3}50%{opacity:1} }
+
+.empty { text-align: center; padding: 60px; color: #333; font-size: 13px; border: 1px dashed #1e1e1e; }
+.empty-icon { font-size: 36px; margin-bottom: 12px; }
+
+.app-list { display: flex; flex-direction: column; gap: 10px; }
+
+.app-card {
+  background: #111; border: 1px solid #1e1e1e; border-left: 3px solid var(--accent);
+  padding: 18px 20px; animation: slideIn 0.2s ease;
+}
+@keyframes slideIn { from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none} }
+
+.app-card-top { display: flex; justify-content: space-between; gap: 16px; align-items: flex-start; }
+.app-info { flex: 1; }
+.app-company { font-size: 11px; color: #555; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 4px; }
+.app-title   { font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 700; color: #fff; }
+.app-sub-meta { font-size: 11px; color: #555; margin-top: 4px; display: flex; gap: 8px; flex-wrap: wrap; }
+
+.app-right { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; flex-shrink: 0; }
+.app-status-badge {
+  font-size: 11px; text-transform: uppercase; letter-spacing: 1px;
+  color: var(--c); border: 1px solid var(--c); padding: 4px 10px; opacity: 0.9;
+}
+.app-date { font-size: 10px; color: #333; }
+
+/* Progress */
+.progress-bar {
+  display: flex; margin-top: 18px; margin-bottom: 4px; position: relative;
+}
+.progress-bar::before {
+  content: ''; position: absolute; top: 6px; left: 6px;
+  right: 6px; height: 1px; background: #1e1e1e; z-index: 0;
+}
+.progress-step {
+  flex: 1; display: flex; flex-direction: column; align-items: center;
+  gap: 6px; position: relative; z-index: 1;
+}
+.progress-dot {
+  width: 12px; height: 12px; border-radius: 50%;
+  background: var(--c); border: 2px solid #111;
+  transition: background 0.3s;
+}
+.progress-step:not(.done) .progress-dot { background: #1e1e1e; }
+.progress-label { font-size: 9px; color: #444; text-transform: uppercase; letter-spacing: 1px; }
+.progress-step.done .progress-label { color: var(--c); opacity: 0.8; }
+
+/* Cover letter */
+.cover-preview { margin-top: 14px; }
+.cover-preview summary {
+  font-size: 10px; color: #444; cursor: pointer; text-transform: uppercase;
+  letter-spacing: 1px; list-style: none; display: inline-flex; gap: 6px;
+}
+.cover-preview summary::before { content: "▶"; font-size: 8px; }
+.cover-preview[open] summary::before { content: "▼"; }
+.cover-preview p { font-size: 12px; color: #666; line-height: 1.7; margin-top: 10px; }
+
+/* Withdraw */
+.withdraw-btn {
+  margin-top: 14px; background: transparent; border: 1px solid #2a2a2a;
+  color: #555; font-family: 'DM Mono', monospace; font-size: 10px;
+  padding: 6px 14px; cursor: pointer; text-transform: uppercase; letter-spacing: 1px;
+  transition: all 0.2s;
+}
+.withdraw-btn:hover { border-color: #f87171; color: #f87171; }
+
+@media (max-width: 600px) {
+  .app-stats { grid-template-columns: repeat(3, 1fr); }
+}
