@@ -1,45 +1,12 @@
-const router = require("express").Router();
+const router      = require("express").Router();
 const Application = require("../Models/Application");
-const Listing = require("../Models/Listing");
-const auth = require("../middleware/auth");
+const Listing     = require("../Models/Listing");
+const auth        = require("../middleware/auth");
 
-// POST /api/apply/:listingId  — applicant submits application
-router.post("/:listingId", auth, async (req, res) => {
-  try {
-    if (req.user.role !== "applicant") {
-      return res.status(403).json({ error: "Only applicants can apply" });
-    }
+// ⚠️  IMPORTANT: GET /mine must be declared BEFORE DELETE /:appId
+//     otherwise Express treats "mine" as an appId param.
 
-    const listing = await Listing.findById(req.params.listingId);
-    if (!listing) return res.status(404).json({ error: "Listing not found" });
-    if (!listing.isOpen) return res.status(400).json({ error: "This listing is closed" });
-
-    // Check for duplicate application
-    const existing = await Application.findOne({
-      listingId: req.params.listingId,
-      applicantId: req.user.id,
-    });
-    if (existing) return res.status(400).json({ error: "You already applied to this listing" });
-
-    const application = await Application.create({
-      listingId: req.params.listingId,
-      applicantId: req.user.id,
-      companyId: listing.companyId,
-      coverLetter: req.body.coverLetter || "",
-    });
-
-    // Increment applicationCount on the listing
-    await Listing.findByIdAndUpdate(req.params.listingId, {
-      $inc: { applicationCount: 1 },
-    });
-
-    res.json(application);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-// GET /api/apply/mine  — applicant gets their own applications
+// GET /api/apply/mine  — applicant sees their own applications
 router.get("/mine", auth, async (req, res) => {
   try {
     if (req.user.role !== "applicant") {
@@ -57,11 +24,46 @@ router.get("/mine", auth, async (req, res) => {
   }
 });
 
-// DELETE /api/apply/:appId  — applicant withdraws their application
+// POST /api/apply/:listingId  — applicant submits application
+router.post("/:listingId", auth, async (req, res) => {
+  try {
+    if (req.user.role !== "applicant") {
+      return res.status(403).json({ error: "Only applicants can apply" });
+    }
+
+    const listing = await Listing.findById(req.params.listingId);
+    if (!listing)       return res.status(404).json({ error: "Listing not found" });
+    if (!listing.isOpen) return res.status(400).json({ error: "This listing is closed" });
+
+    // Prevent duplicate application
+    const existing = await Application.findOne({
+      listingId:   req.params.listingId,
+      applicantId: req.user.id,
+    });
+    if (existing) return res.status(400).json({ error: "You already applied to this listing" });
+
+    const application = await Application.create({
+      listingId:   req.params.listingId,
+      applicantId: req.user.id,
+      companyId:   listing.companyId,
+      coverLetter: req.body.coverLetter || "",
+    });
+
+    await Listing.findByIdAndUpdate(req.params.listingId, {
+      $inc: { applicationCount: 1 },
+    });
+
+    res.json(application);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// DELETE /api/apply/:appId  — applicant withdraws (submitted only)
 router.delete("/:appId", auth, async (req, res) => {
   try {
     const app = await Application.findOne({
-      _id: req.params.appId,
+      _id:         req.params.appId,
       applicantId: req.user.id,
     });
 
@@ -72,7 +74,6 @@ router.delete("/:appId", auth, async (req, res) => {
 
     await Application.findByIdAndDelete(req.params.appId);
 
-    // Decrement applicationCount
     await Listing.findByIdAndUpdate(app.listingId, {
       $inc: { applicationCount: -1 },
     });

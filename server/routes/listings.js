@@ -1,65 +1,42 @@
-const mongoose = require("mongoose");
+const router = require("express").Router();
+const Listing = require("../Models/Listing");
 
-const ListingSchema = new mongoose.Schema(
-  {
-    companyId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
-      required: true,
-    },
+// GET /api/listings  — public, supports ?q=search&type=full-time
+router.get("/", async (req, res) => {
+  try {
+    const filter = { isOpen: true };
 
-    companyName: {
-      type: String,
-      required: true,
-    },
+    if (req.query.type) {
+      filter.type = req.query.type;
+    }
 
-    title: {
-      type: String,
-      required: true,
-    },
+    if (req.query.q) {
+      const regex = new RegExp(req.query.q, "i");
+      filter.$or = [
+        { title: regex },
+        { description: regex },
+        { skills: regex },
+        { companyName: regex },
+        { location: regex },
+      ];
+    }
 
-    description: {
-      type: String,
-      required: true,
-    },
+    const listings = await Listing.find(filter).sort({ createdAt: -1 });
+    res.json(listings);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 
-    location: {
-      type: String,
-      default: "Remote",
-    },
+// GET /api/listings/:id  — public
+router.get("/:id", async (req, res) => {
+  try {
+    const listing = await Listing.findById(req.params.id);
+    if (!listing) return res.status(404).json({ error: "Listing not found" });
+    res.json(listing);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 
-    type: {
-      type: String,
-      enum: ["full-time", "part-time", "internship", "contract"],
-      default: "full-time",
-    },
-
-    salary: {
-      type: String,
-      default: "",
-    },
-
-    skills: {
-      type: [String],
-      default: [],
-    },
-
-    deadline: {
-      type: Date,
-      default: null,
-    },
-
-    isOpen: {
-      type: Boolean,
-      default: true,
-    },
-
-    applicationCount: {
-      type: Number,
-      default: 0,
-    },
-  },
-  { timestamps: true }
-);
-
-module.exports = mongoose.model("Listing", ListingSchema);
+module.exports = router;

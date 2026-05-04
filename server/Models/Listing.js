@@ -11,11 +11,13 @@ const ListingSchema = new mongoose.Schema(
     companyName: {
       type: String,
       required: true,
+      trim: true,
     },
 
     title: {
       type: String,
       required: true,
+      trim: true,
     },
 
     description: {
@@ -26,11 +28,12 @@ const ListingSchema = new mongoose.Schema(
     location: {
       type: String,
       default: "Remote",
+      trim: true,
     },
 
     type: {
       type: String,
-      enum: ["full-time", "part-time", "internship", "contract"],
+      enum: ["full-time", "part-time", "contract", "internship"],
       default: "full-time",
     },
 
@@ -61,5 +64,10 @@ const ListingSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+
+// Text search index for job board search
+ListingSchema.index({ title: "text", description: "text", skills: "text" });
+ListingSchema.index({ companyId: 1 });
+ListingSchema.index({ isOpen: 1 });
 
 module.exports = mongoose.model("Listing", ListingSchema);

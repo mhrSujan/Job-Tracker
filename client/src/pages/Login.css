@@ -11,11 +11,7 @@
   font-family: 'DM Mono', monospace;
 }
 
-.login-wrap {
-  width: 100%;
-  max-width: 440px;
-  padding: 24px;
-}
+.login-wrap { width: 100%; max-width: 440px; padding: 24px; }
 
 .brand { text-align: center; margin-bottom: 40px; }
 .brand-name {
@@ -27,116 +23,52 @@
   line-height: 1;
 }
 .brand-name span { color: #4ade80; }
-.brand-sub {
-  font-size: 10px;
-  color: #333;
-  letter-spacing: 3px;
-  text-transform: uppercase;
-  margin-top: 8px;
-}
+.brand-sub { font-size: 10px; color: #333; letter-spacing: 3px; text-transform: uppercase; margin-top: 8px; }
 
-.tabs {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  border: 1px solid #1e1e1e;
-  margin-bottom: 24px;
-}
+.tabs { display: grid; grid-template-columns: 1fr 1fr; border: 1px solid #1e1e1e; margin-bottom: 24px; }
 .tab {
-  background: transparent;
-  border: none;
-  color: #444;
-  font-family: 'DM Mono', monospace;
-  font-size: 11px;
-  padding: 12px;
-  cursor: pointer;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  transition: all 0.2s;
+  background: transparent; border: none; color: #444;
+  font-family: 'DM Mono', monospace; font-size: 11px;
+  padding: 12px; cursor: pointer; letter-spacing: 2px;
+  text-transform: uppercase; transition: all 0.2s;
   border-bottom: 2px solid transparent;
 }
 .tab.active { color: #4ade80; background: #0d1f0d; border-bottom-color: #4ade80; }
 
-/* Role picker */
-.role-picker {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-  margin-bottom: 20px;
-}
+.role-picker { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
 .role-btn {
-  background: #111;
-  border: 1px solid #1e1e1e;
-  color: #555;
-  font-family: 'DM Mono', monospace;
-  cursor: pointer;
-  padding: 16px 12px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
-  transition: all 0.2s;
+  background: #111; border: 1px solid #1e1e1e; color: #555;
+  font-family: 'DM Mono', monospace; cursor: pointer;
+  padding: 16px 12px; display: flex; flex-direction: column;
+  align-items: center; gap: 6px; transition: all 0.2s;
 }
 .role-btn.active { border-color: #4ade80; background: #0d1f0d; color: #4ade80; }
 .role-icon  { font-size: 24px; }
 .role-label { font-size: 12px; font-weight: 500; letter-spacing: 0.5px; }
 .role-desc  { font-size: 9px; opacity: 0.6; letter-spacing: 1px; text-transform: uppercase; }
 
-/* Fields */
 .field { margin-bottom: 16px; }
-.field-label {
-  display: block;
-  font-size: 10px;
-  color: #444;
-  text-transform: uppercase;
-  letter-spacing: 2px;
-  margin-bottom: 8px;
-}
+.field-label { display: block; font-size: 10px; color: #444; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 8px; }
 .field-input {
-  width: 100%;
-  background: #111;
-  border: 1px solid #1e1e1e;
-  color: #e8e8e8;
-  font-family: 'DM Mono', monospace;
-  font-size: 14px;
-  padding: 12px 16px;
-  outline: none;
-  transition: border-color 0.2s;
+  width: 100%; background: #111; border: 1px solid #1e1e1e;
+  color: #e8e8e8; font-family: 'DM Mono', monospace; font-size: 14px;
+  padding: 12px 16px; outline: none; transition: border-color 0.2s;
 }
 .field-input:focus { border-color: #4ade80; background: #0d1f0d; }
 .field-input::placeholder { color: #2a2a2a; }
 
 .login-error {
-  background: #1a0808;
-  border: 1px solid #f87171;
-  color: #f87171;
-  font-size: 11px;
-  padding: 10px 14px;
-  margin-bottom: 12px;
-  letter-spacing: 0.5px;
+  background: #1a0808; border: 1px solid #f87171; color: #f87171;
+  font-size: 11px; padding: 10px 14px; margin-bottom: 12px;
 }
 
 .submit-btn {
-  width: 100%;
-  background: #4ade80;
-  color: #0a0a0a;
-  border: none;
-  font-family: 'Syne', sans-serif;
-  font-weight: 700;
-  font-size: 14px;
-  padding: 14px;
-  cursor: pointer;
-  letter-spacing: 0.5px;
-  margin-top: 8px;
-  transition: all 0.15s;
-  text-transform: uppercase;
+  width: 100%; background: #4ade80; color: #0a0a0a; border: none;
+  font-family: 'Syne', sans-serif; font-weight: 700; font-size: 14px;
+  padding: 14px; cursor: pointer; letter-spacing: 0.5px; margin-top: 8px;
+  transition: all 0.15s; text-transform: uppercase;
 }
 .submit-btn:hover    { background: #22c55e; }
 .submit-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
-.hint {
-  text-align: center;
-  font-size: 10px;
-  color: #222;
-  margin-top: 24px;
-  letter-spacing: 1px;
-}
+.hint { text-align: center; font-size: 10px; color: #222; margin-top: 24px; letter-spacing: 1px; }

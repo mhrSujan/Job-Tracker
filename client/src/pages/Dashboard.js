@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { jobsAPI } from "../api";
@@ -14,23 +13,26 @@ const STATUS_META = {
 };
 
 export default function Dashboard() {
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
   const displayName = user?.name || user?.email || "User";
+
   const [jobs,    setJobs]    = useState([]);
   const [company, setCompany] = useState("");
   const [role,    setRole]    = useState("");
   const [status,  setStatus]  = useState("applied");
-  const [notes,   setNotes]   = useState("");
   const [link,    setLink]    = useState("");
   const [loading, setLoading] = useState(true);
   const [adding,  setAdding]  = useState(false);
   const [filter,  setFilter]  = useState("all");
   const [error,   setError]   = useState("");
 
+  // GET /api/jobs
   const fetchJobs = async () => {
     try {
       const res = await jobsAPI.list();
       setJobs(res.data);
+    } catch {
+      // 401 is handled globally by the axios interceptor
     } finally {
       setLoading(false);
     }
@@ -38,23 +40,41 @@ export default function Dashboard() {
 
   useEffect(() => { fetchJobs(); }, []);
 
+  // POST /api/jobs
   const addJob = async () => {
-    if (!company || !role) return setError("Company and role are required");
+    if (!company.trim() || !role.trim()) return setError("Company and role are required");
     setError("");
     setAdding(true);
     try {
-      await jobsAPI.add({ company, role, status, notes, link });
-      setCompany(""); setRole(""); setStatus("applied"); setNotes(""); setLink("");
+      await jobsAPI.add({ company, role, status, link });
+      setCompany(""); setRole(""); setStatus("applied"); setLink("");
       fetchJobs();
     } catch {
-      setError("Failed to add job");
+      setError("Failed to add job. Make sure the server is running.");
     } finally {
       setAdding(false);
     }
   };
 
-  const deleteJob    = async (id)            => { await jobsAPI.remove(id);           fetchJobs(); };
-  const updateStatus = async (id, newStatus) => { await jobsAPI.update(id, { status: newStatus }); fetchJobs(); };
+  // DELETE /api/jobs/:id
+  const deleteJob = async (id) => {
+    try {
+      await jobsAPI.remove(id);
+      fetchJobs();
+    } catch {
+      setError("Failed to delete job");
+    }
+  };
+
+  // PUT /api/jobs/:id
+  const updateStatus = async (id, newStatus) => {
+    try {
+      await jobsAPI.update(id, { status: newStatus });
+      fetchJobs();
+    } catch {
+      setError("Failed to update status");
+    }
+  };
 
   const filteredJobs = filter === "all" ? jobs : jobs.filter(j => j.status === filter);
   const stats = {
@@ -68,7 +88,6 @@ export default function Dashboard() {
     <>
       <Nav />
       <div className="dashboard">
-        {/* Header */}
         <div className="header">
           <div>
             <h1 className="title">My Tracker</h1>
@@ -84,10 +103,10 @@ export default function Dashboard() {
         {/* Stats */}
         <div className="stats-row">
           {[
-            { label: "Total Applied",  num: stats.total,     accent: "#818cf8" },
-            { label: "Interviews",     num: stats.interview, accent: "#fb923c" },
-            { label: "Offers",         num: stats.offer,     accent: "#4ade80" },
-            { label: "Rejected",       num: stats.rejected,  accent: "#f87171" },
+            { label: "Total Applied", num: stats.total,     accent: "#818cf8" },
+            { label: "Interviews",    num: stats.interview, accent: "#fb923c" },
+            { label: "Offers",        num: stats.offer,     accent: "#4ade80" },
+            { label: "Rejected",      num: stats.rejected,  accent: "#f87171" },
           ].map(s => (
             <div key={s.label} className="stat-card" style={{ "--accent": s.accent }}>
               <div className="stat-num">{s.num}</div>
@@ -96,18 +115,20 @@ export default function Dashboard() {
           ))}
         </div>
 
-        {/* Add form */}
+        {/* Add job form */}
         <div className="add-form">
           <div className="form-row">
             <div className="field">
               <label className="form-label">Company</label>
               <input className="input" placeholder="e.g. Stripe" value={company}
-                onChange={e => setCompany(e.target.value)} onKeyDown={e => e.key === "Enter" && addJob()} />
+                onChange={e => setCompany(e.target.value)}
+                onKeyDown={e => e.key === "Enter" && addJob()} />
             </div>
             <div className="field">
               <label className="form-label">Role</label>
               <input className="input" placeholder="e.g. SWE Intern" value={role}
-                onChange={e => setRole(e.target.value)} onKeyDown={e => e.key === "Enter" && addJob()} />
+                onChange={e => setRole(e.target.value)}
+                onKeyDown={e => e.key === "Enter" && addJob()} />
             </div>
             <div className="field">
               <label className="form-label">Link (optional)</label>
@@ -135,7 +156,7 @@ export default function Dashboard() {
 
         {/* Filters */}
         <div className="filters">
-          {["all","applied","interview","offer","rejected"].map(f => (
+          {["all", "applied", "interview", "offer", "rejected"].map(f => (
             <button key={f} className={`filter-btn ${filter === f ? "active" : ""}`}
               onClick={() => setFilter(f)}>{f}</button>
           ))}
@@ -164,7 +185,9 @@ export default function Dashboard() {
                       </a>
                     )}
                     <div className="job-date">
-                      {new Date(job.dateApplied).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+                      {new Date(job.dateApplied).toLocaleDateString("en-US", {
+                        month: "short", day: "numeric", year: "numeric",
+                      })}
                     </div>
                   </div>
                   <div className="job-actions">

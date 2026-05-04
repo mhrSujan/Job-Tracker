@@ -1,61 +1,40 @@
 @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap');
 
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
 body { background: #0a0a0a; color: #e8e8e8; font-family: 'DM Mono', monospace; }
 
 .dashboard { max-width: 960px; margin: 0 auto; padding: 40px 24px; }
 
 .header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 36px; }
-.title  { font-family: 'Syne', sans-serif; font-size: 36px; font-weight: 800; letter-spacing: -1px; color: #fff; }
+.title    { font-family: 'Syne', sans-serif; font-size: 36px; font-weight: 800; letter-spacing: -1px; color: #fff; }
 .subtitle { font-size: 11px; color: #555; margin-top: 6px; letter-spacing: 1px; }
 
-.stats-row {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 10px;
-  margin-bottom: 32px;
-}
-.stat-card {
-  background: #111;
-  border: 1px solid #1e1e1e;
-  border-left: 3px solid var(--accent);
-  padding: 18px;
-}
+.stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 32px; }
+.stat-card { background: #111; border: 1px solid #1e1e1e; border-left: 3px solid var(--accent); padding: 18px; }
 .stat-num   { font-family: 'Syne', sans-serif; font-size: 32px; font-weight: 800; color: var(--accent); }
 .stat-label { font-size: 10px; color: #555; text-transform: uppercase; letter-spacing: 2px; margin-top: 4px; }
 
 .add-form { background: #111; border: 1px solid #1e1e1e; padding: 20px; margin-bottom: 24px; }
-.form-row { display: grid; grid-template-columns: 1fr 1fr 1fr auto auto; gap: 10px; align-items: end; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr auto; gap: 10px; align-items: end; }
 .form-label { font-size: 10px; color: #555; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 6px; display: block; }
 .form-error { font-size: 11px; color: #f87171; margin-top: 10px; }
 
 .input, .select {
-  background: #0a0a0a;
-  border: 1px solid #2a2a2a;
-  color: #e8e8e8;
-  font-family: 'DM Mono', monospace;
-  font-size: 13px;
-  padding: 10px 12px;
-  outline: none;
-  width: 100%;
-  transition: border-color 0.2s;
+  background: #0a0a0a; border: 1px solid #2a2a2a; color: #e8e8e8;
+  font-family: 'DM Mono', monospace; font-size: 13px;
+  padding: 10px 12px; outline: none; width: 100%; transition: border-color 0.2s;
 }
 .input:focus { border-color: #4ade80; }
 .input::placeholder { color: #333; }
 .select { cursor: pointer; }
 
 .add-btn {
-  background: #4ade80; color: #0a0a0a;
-  border: none; font-family: 'Syne', sans-serif;
-  font-weight: 700; font-size: 13px;
-  padding: 10px 20px; cursor: pointer;
-  white-space: nowrap; transition: all 0.15s;
-  width: 100%;
+  background: #4ade80; color: #0a0a0a; border: none;
+  font-family: 'Syne', sans-serif; font-weight: 700; font-size: 13px;
+  padding: 10px 20px; cursor: pointer; white-space: nowrap;
+  transition: all 0.15s; width: 100%;
 }
 .add-btn:hover    { background: #22c55e; }
 .add-btn:disabled { opacity: 0.4; cursor: not-allowed; }
-
 .btn-field { min-width: 90px; }
 
 .filters { display: flex; gap: 4px; margin-bottom: 16px; flex-wrap: wrap; }
@@ -70,16 +49,14 @@ body { background: #0a0a0a; color: #e8e8e8; font-family: 'DM Mono', monospace; }
 .jobs-list { display: flex; flex-direction: column; gap: 8px; }
 
 .job-card {
-  background: var(--bg, #111);
-  border: 1px solid #1e1e1e;
+  background: var(--bg, #111); border: 1px solid #1e1e1e;
   border-left: 3px solid var(--accent);
-  padding: 16px 18px;
-  display: flex; align-items: center; justify-content: space-between; gap: 16px;
-  animation: slideIn 0.2s ease;
+  padding: 16px 18px; display: flex; align-items: center;
+  justify-content: space-between; gap: 16px; animation: slideIn 0.2s ease;
 }
 @keyframes slideIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
 
-.job-info   { flex: 1; min-width: 0; }
+.job-info    { flex: 1; min-width: 0; }
 .job-company { font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700; color: #fff; }
 .job-role    { font-size: 12px; color: #666; margin-top: 2px; }
 .job-link    { font-size: 10px; color: #4ade80; text-decoration: none; margin-top: 3px; display: block; }

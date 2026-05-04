@@ -1,11 +1,10 @@
-
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import Login          from "./pages/Login";
-import Dashboard      from "./pages/Dashboard";        // applicant tracker
-import JobBoard       from "./pages/JobBoard";          // public listings
-import MyApplications from "./pages/MyApplications";   // applicant: see their apps
-import AdminDashboard from "./pages/AdminDashboard";   // company: post + review
+import Dashboard      from "./pages/Dashboard";
+import JobBoard       from "./pages/JobBoard";
+import MyApplications from "./pages/MyApplications";
+import AdminDashboard from "./pages/AdminDashboard";
 
 // ── Route guards ──────────────────────────────────────────────
 function PrivateRoute({ children }) {
@@ -15,7 +14,7 @@ function PrivateRoute({ children }) {
 
 function AdminRoute({ children }) {
   const { user } = useAuth();
-  if (!user)               return <Navigate to="/login"  replace />;
+  if (!user)                return <Navigate to="/login" replace />;
   if (user.role !== "admin") return <Navigate to="/"     replace />;
   return children;
 }
@@ -24,18 +23,18 @@ function AppRoutes() {
   return (
     <Routes>
       {/* Public */}
-      <Route path="/login"    element={<Login />} />
-      <Route path="/jobs"     element={<JobBoard />} />          {/* browsable w/o login */}
+      <Route path="/login" element={<Login />} />
+      <Route path="/jobs"  element={<JobBoard />} />
 
       {/* Applicant */}
-      <Route path="/"         element={<PrivateRoute><Dashboard /></PrivateRoute>} />
-      <Route path="/applied"  element={<PrivateRoute><MyApplications /></PrivateRoute>} />
+      <Route path="/"       element={<PrivateRoute><Dashboard /></PrivateRoute>} />
+      <Route path="/applied" element={<PrivateRoute><MyApplications /></PrivateRoute>} />
 
-      {/* Admin / Company */}
-      <Route path="/admin"    element={<AdminRoute><AdminDashboard /></AdminRoute>} />
+      {/* Admin */}
+      <Route path="/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
 
       {/* Fallback */}
-      <Route path="*"         element={<Navigate to="/" replace />} />
+      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
 }

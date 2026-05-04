@@ -1,4 +1,3 @@
-
 // Provides { user, login, logout, updateUser } to the whole app.
 // Persists user data in localStorage alongside the JWT token.
 
@@ -17,12 +16,11 @@ export function AuthProvider({ children }) {
   });
 
   const login = useCallback((token, userData) => {
-  if (!token || !userData) return;
-
-  localStorage.setItem("token", token);
-  localStorage.setItem("user", JSON.stringify(userData));
-  setUser(userData);
-}, []);
+    if (!token || !userData) return;
+    localStorage.setItem("token", token);
+    localStorage.setItem("user", JSON.stringify(userData));
+    setUser(userData);
+  }, []);
 
   const logout = useCallback(() => {
     localStorage.removeItem("token");
@@ -31,7 +29,7 @@ export function AuthProvider({ children }) {
   }, []);
 
   const updateUser = useCallback((updates) => {
-    setUser(prev => {
+    setUser((prev) => {
       const next = { ...prev, ...updates };
       localStorage.setItem("user", JSON.stringify(next));
       return next;

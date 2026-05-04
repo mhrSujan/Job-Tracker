@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { authAPI } from "../api";
@@ -9,7 +8,7 @@ export default function Login() {
   const navigate  = useNavigate();
   const { login } = useAuth();
 
-  const [mode,        setMode]        = useState("login");    // "login" | "register"
+  const [mode,        setMode]        = useState("login");
   const [role,        setRole]        = useState("applicant");
   const [email,       setEmail]       = useState("");
   const [password,    setPassword]    = useState("");
@@ -20,19 +19,16 @@ export default function Login() {
 
   const handleSubmit = async () => {
     setError("");
-    if (!email || !password) {
-  return setError("Email and password are required");
-}
 
-if (mode === "register") {
-  if (role === "applicant" && !name.trim()) {
-    return setError("Name is required");
-  }
+    // Validation
+    if (!email.trim() || !password.trim()) {
+      return setError("Email and password are required");
+    }
+    if (mode === "register") {
+      if (role === "applicant" && !name.trim())        return setError("Name is required");
+      if (role === "admin"     && !companyName.trim()) return setError("Company name is required");
+    }
 
-  if (role === "admin" && !companyName.trim()) {
-    return setError("Company name is required");
-  }
-}
     setLoading(true);
     try {
       if (mode === "login") {
@@ -56,6 +52,8 @@ if (mode === "register") {
 
   const handleKey = (e) => { if (e.key === "Enter") handleSubmit(); };
 
+  const switchMode = (m) => { setMode(m); setError(""); };
+
   return (
     <div className="login-page">
       <div className="login-wrap">
@@ -67,25 +65,19 @@ if (mode === "register") {
 
         {/* Login / Register tabs */}
         <div className="tabs">
-          <button className={`tab ${mode === "login"    ? "active" : ""}`} onClick={() => { setMode("login");    setError(""); }}>Sign In</button>
-          <button className={`tab ${mode === "register" ? "active" : ""}`} onClick={() => { setMode("register"); setError(""); }}>Register</button>
+          <button className={`tab ${mode === "login"    ? "active" : ""}`} onClick={() => switchMode("login")}>Sign In</button>
+          <button className={`tab ${mode === "register" ? "active" : ""}`} onClick={() => switchMode("register")}>Register</button>
         </div>
 
-        {/* Role picker (register only) */}
+        {/* Role picker — register only */}
         {mode === "register" && (
           <div className="role-picker">
-            <button
-              className={`role-btn ${role === "applicant" ? "active" : ""}`}
-              onClick={() => setRole("applicant")}
-            >
+            <button className={`role-btn ${role === "applicant" ? "active" : ""}`} onClick={() => setRole("applicant")}>
               <span className="role-icon">🎯</span>
               <span className="role-label">Job Seeker</span>
               <span className="role-desc">Find & track jobs</span>
             </button>
-            <button
-              className={`role-btn ${role === "admin" ? "active" : ""}`}
-              onClick={() => setRole("admin")}
-            >
+            <button className={`role-btn ${role === "admin" ? "active" : ""}`} onClick={() => setRole("admin")}>
               <span className="role-icon">🏢</span>
               <span className="role-label">Company</span>
               <span className="role-desc">Post & manage listings</span>
@@ -93,23 +85,23 @@ if (mode === "register") {
           </div>
         )}
 
-        {/* Name / Company fields */}
+        {/* Extra fields for register */}
         {mode === "register" && role === "applicant" && (
           <div className="field">
             <label className="field-label">Your Name</label>
-            <input className="field-input" placeholder="Ramu Bhai" value={name}
+            <input className="field-input" placeholder="Jane Doe" value={name}
               onChange={e => setName(e.target.value)} onKeyDown={handleKey} />
           </div>
         )}
         {mode === "register" && role === "admin" && (
           <div className="field">
             <label className="field-label">Company Name</label>
-            <input className="field-input" placeholder="Thulo Company" value={companyName}
+            <input className="field-input" placeholder="Acme Corp" value={companyName}
               onChange={e => setCompanyName(e.target.value)} onKeyDown={handleKey} />
           </div>
         )}
 
-        {/* Email + Password */}
+        {/* Email & Password */}
         <div className="field">
           <label className="field-label">Email</label>
           <input className="field-input" type="email" placeholder="you@example.com"

@@ -1,18 +1,16 @@
-
 import { useEffect, useState } from "react";
 import { applyAPI } from "../api";
 import Nav from "../components/Nav";
 import "./MyApplications.css";
 
 const STATUS_META = {
-  submitted:  { color: "#818cf8", label: "Submitted",  icon: "📤" },
-  reviewing:  { color: "#fb923c", label: "Reviewing",  icon: "👀" },
-  interview:  { color: "#38bdf8", label: "Interview",  icon: "🎤" },
-  offer:      { color: "#4ade80", label: "Offer 🎉",   icon: "🎉" },
-  rejected:   { color: "#f87171", label: "Rejected",   icon: "❌" },
+  submitted: { color: "#818cf8", label: "Submitted", icon: "📤" },
+  reviewing: { color: "#fb923c", label: "Reviewing", icon: "👀" },
+  interview: { color: "#38bdf8", label: "Interview", icon: "🎤" },
+  offer:     { color: "#4ade80", label: "Offer 🎉",  icon: "🎉" },
+  rejected:  { color: "#f87171", label: "Rejected",  icon: "❌" },
 };
 
-// Visual progress pipeline
 const STAGES = ["submitted", "reviewing", "interview", "offer"];
 
 export default function MyApplications() {
@@ -21,6 +19,7 @@ export default function MyApplications() {
   const [filter,  setFilter]  = useState("all");
   const [error,   setError]   = useState("");
 
+  // GET /api/apply/mine
   useEffect(() => {
     applyAPI.myApps()
       .then(res => setApps(res.data))
@@ -28,6 +27,7 @@ export default function MyApplications() {
       .finally(() => setLoading(false));
   }, []);
 
+  // DELETE /api/apply/:appId
   const withdraw = async (appId) => {
     if (!window.confirm("Withdraw this application?")) return;
     try {
@@ -40,9 +40,10 @@ export default function MyApplications() {
 
   const filtered = filter === "all" ? apps : apps.filter(a => a.status === filter);
 
-  // Stats
   const stats = {};
-  Object.keys(STATUS_META).forEach(s => { stats[s] = apps.filter(a => a.status === s).length; });
+  Object.keys(STATUS_META).forEach(s => {
+    stats[s] = apps.filter(a => a.status === s).length;
+  });
 
   return (
     <>
@@ -53,7 +54,7 @@ export default function MyApplications() {
           <p className="myapps-sub">Track every application you submitted through JobTrack</p>
         </div>
 
-        {/* Stats row */}
+        {/* Stats */}
         <div className="app-stats">
           {Object.entries(STATUS_META).map(([key, meta]) => (
             <div key={key} className="app-stat" style={{ "--c": meta.color }}>
@@ -67,7 +68,8 @@ export default function MyApplications() {
         {/* Filters */}
         <div className="filters">
           {["all", ...Object.keys(STATUS_META)].map(f => (
-            <button key={f} className={`filter-btn ${filter === f ? "active" : ""}`}
+            <button key={f}
+              className={`filter-btn ${filter === f ? "active" : ""}`}
               onClick={() => setFilter(f)}>
               {f}
             </button>
@@ -76,7 +78,6 @@ export default function MyApplications() {
 
         {error && <div className="myapps-error">{error}</div>}
 
-        {/* Applications list */}
         {loading ? (
           <div className="loading">Loading applications…</div>
         ) : filtered.length === 0 ? (
@@ -89,21 +90,25 @@ export default function MyApplications() {
         ) : (
           <div className="app-list">
             {filtered.map(app => {
-              const listing = app?.listingId || {};
-              const company = app?.companyId || {};
-              const meta    = STATUS_META[app.status] || STATUS_META.submitted;
+              // Server populates listingId as an object
+              const listing  = app.listingId || {};
+              const company  = app.companyId  || {};
+              const meta     = STATUS_META[app.status] || STATUS_META.submitted;
               const stageIdx = STAGES.indexOf(app.status);
 
               return (
                 <div key={app._id} className="app-card" style={{ "--accent": meta.color }}>
                   <div className="app-card-top">
                     <div className="app-info">
-                      <div className="app-company">{listing?.companyName || company?.companyName || "Unknown Company"}</div>
-                      <div className="app-title">{listing?.title || "Position"}</div>
+                      {/* companyName comes from populated listingId or companyId */}
+                      <div className="app-company">
+                        {listing.companyName || company.companyName || "Unknown Company"}
+                      </div>
+                      <div className="app-title">{listing.title || "Position"}</div>
                       <div className="app-sub-meta">
-                        {listing?.location && <span>📍 {listing.location}</span>}
-                        {listing?.type     && <span>· {listing.type}</span>}
-                        {listing?.salary   && <span>· {listing.salary}</span>}
+                        {listing.location && <span>📍 {listing.location}</span>}
+                        {listing.type     && <span>· {listing.type}</span>}
+                        {listing.salary   && <span>· {listing.salary}</span>}
                       </div>
                     </div>
                     <div className="app-right">
@@ -111,16 +116,20 @@ export default function MyApplications() {
                         {meta.icon} {meta.label}
                       </span>
                       <div className="app-date">
-                        Applied {new Date(app.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
+                        Applied{" "}
+                        {new Date(app.createdAt).toLocaleDateString("en-US", {
+                          month: "short", day: "numeric",
+                        })}
                       </div>
                     </div>
                   </div>
 
-                  {/* Progress bar (not shown for rejected) */}
+                  {/* Progress bar — hidden for rejected */}
                   {app.status !== "rejected" && (
                     <div className="progress-bar">
                       {STAGES.map((stage, i) => (
-                        <div key={stage} className={`progress-step ${i <= stageIdx ? "done" : ""}`}
+                        <div key={stage}
+                          className={`progress-step ${i <= stageIdx ? "done" : ""}`}
                           style={{ "--c": i <= stageIdx ? meta.color : "#1e1e1e" }}>
                           <div className="progress-dot" />
                           <div className="progress-label">{stage}</div>
@@ -129,7 +138,7 @@ export default function MyApplications() {
                     </div>
                   )}
 
-                  {/* Cover letter preview */}
+                  {/* Cover letter */}
                   {app.coverLetter && (
                     <details className="cover-preview">
                       <summary>View cover letter</summary>
@@ -137,7 +146,7 @@ export default function MyApplications() {
                     </details>
                   )}
 
-                  {/* Withdraw (only for submitted) */}
+                  {/* Withdraw — only while submitted */}
                   {app.status === "submitted" && (
                     <button className="withdraw-btn" onClick={() => withdraw(app._id)}>
                       Withdraw application

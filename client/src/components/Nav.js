@@ -20,7 +20,7 @@ export default function Nav() {
 
         {user?.role === "applicant" && (
           <>
-            <Link to="/" className={isActive("/")}>My Tracker</Link>
+            <Link to="/"       className={isActive("/")}>My Tracker</Link>
             <Link to="/applied" className={isActive("/applied")}>Applications</Link>
           </>
         )}
