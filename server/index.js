@@ -4,7 +4,12 @@ const mongoose = require("mongoose");
 const cors     = require("cors");
 
 const app = express();
-app.use(cors());
+app.use(cors({
+  origin: [
+    "http://localhost:3000",
+    "https://jobtrack.vercel.app"   //
+  ]
+}));
 app.use(express.json());
 
 mongoose
