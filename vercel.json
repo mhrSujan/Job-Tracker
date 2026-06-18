@@ -4,8 +4,7 @@
   "framework": null,
   "build": {
     "env": {
-      "CI": "false",
-      "REACT_APP_API_URL": "https://job-tracker-68wb.onrender.com"
+      "CI": "false"
     }
   }
 }
