@@ -5,7 +5,7 @@
   "build": {
     "env": {
       "CI": "false",
-      "REACT_APP_API_URL": "https://your-render-url.onrender.com/api"
+      "REACT_APP_API_URL": "https://job-tracker-68wb.onrender.com"
     }
   }
 }
